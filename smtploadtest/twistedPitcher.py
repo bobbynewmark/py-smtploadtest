@@ -1,6 +1,7 @@
 from twisted.internet import reactor
 from twisted.internet import task
 from twisted.internet.defer import DeferredList
+from twisted.application import service
 import createmsg
 import sendmsg
 import time
@@ -72,6 +73,7 @@ class Pitcher(object):
 
         dl = DeferredList(defereds)
         dl.addCallback(self.end)
+        return dl
 
     def action(self, i):
         
@@ -113,3 +115,12 @@ class Pitcher(object):
 
 
 
+class PitcherService(service.Service):
+    def __init__(self, pitcher):
+        self.pitcher = pitcher
+
+    def startService(self):
+        self.dl = self.pitcher.innings()
+
+    def stopService(self):
+        return self.dl.cancel()

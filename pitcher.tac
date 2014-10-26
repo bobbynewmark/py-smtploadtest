@@ -1,5 +1,5 @@
 from twisted.application import service
-from smtploadtest.twistedPitcher import Pitcher, PitcherConfig
+from smtploadtest.twistedPitcher import Pitcher, PitcherConfig, PitcherService
 import logging
 
 application = service.Application("Pitcher")
@@ -11,8 +11,11 @@ formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(messag
 ch.setFormatter(formatter)
 logger.addHandler(ch)
 
+application = service.Application("emailpitcher")
 p = Pitcher(PitcherConfig("config.json"))
-p.innings()
+ps = PitcherService(p)
+ps.setName("pitcherService")
+ps.setServiceParent(application)
 
 
 
