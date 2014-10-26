@@ -82,8 +82,9 @@ class Pitcher(object):
         try:
             time_taken = self.pitch(ball, self.config.smtp_ip, self.config.smtp_port)
             self.send_to_scoreboard(self.config.scoreboard_url, ball["cid"], time_taken)
-        except:
+        except Exception as e:
             self.logger.error("PITCH FAIL!!!")
+            self.logger.error(e);
         
 
     def end(self, result):
