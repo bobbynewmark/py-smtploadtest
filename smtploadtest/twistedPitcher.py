@@ -47,9 +47,11 @@ class Pitcher(object):
     def	pitch(self, ball, smtp_ip, smtp_port):
         self.logger.debug("pitching")
         timing = sendmsg.send_msg(smtp_ip, smtp_port, False, None, None, ball["msg"])
+        self.logger.debug("pitch away")
         return timing
 
     def send_to_scoreboard(self,base_url, cid, time_taken):
+        self.logger.debug("sending to scoreboard")
         t1 = time.time()
         f = urllib.urlopen(base_url + "/add?cid=%s&pitch_time=%s" % (cid, time_taken))
         f.read() #TODO: Check result
