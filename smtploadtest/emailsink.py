@@ -39,8 +39,8 @@ class SinkMessage(object):
         self.logger.debug("cid: %s len: %s", cid, len(msg.as_string()))
         client.getPage("http://localhost:8002/add?cid=%s&catch_time=%s" % (cid, time.time()) )
 
-        with open("/temp/bp/" + str(uuid.uuid4()) + ".txt", "w") as f:
-            f.write(msg.as_string())   
+        #with open("/temp/bp/" + str(uuid.uuid4()) + ".txt", "w") as f:
+        #    f.write(msg.as_string())   
 
         return d.callback("finished")
 
