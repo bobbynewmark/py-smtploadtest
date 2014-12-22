@@ -1,7 +1,8 @@
 #Python BulitIns
-import os, time, logging
+import os, time, logging, mimetypes
 from email.Header import Header
 import email, json, sys, time, uuid
+from HTMLParser import HTMLParser
 
 #External Modules
 from twisted.mail import smtp, maildir
@@ -10,13 +11,90 @@ from zope.interface import implements
 from twisted.internet import protocol, reactor, defer, task
 from twisted.web import client
 
+def noop(*args):
+    return 
+
+class QuickParser(HTMLParser):
+
+    def __init__(self):
+        self.first_img_src = ""
+        self.first_link_href = ""
+        HTMLParser.__init__(self)
+        self.logger = logging.getLogger("QuickParser")
+    
+    def handle_starttag(self, tag, attrs):
+        #self.logger.debug("%s:%s" % tag, attrs)
+        if tag == "img" and not self.first_img_src:
+            srcs = [item[1] for item in attrs if item[0] == "src"]
+            if srcs:
+                self.first_img_src = srcs[0]
+        elif tag == "a" and not self.first_link_href:
+            hrefs = [item[1] for item in attrs if item[0] == "href"]
+            if hrefs:
+                self.first_link_href = hrefs[0]
+        #ignoreing everything else
+
+class EmailProcessor(object):
+    def __init__(self, lines):
+        self.lines = lines
+        self.logger = logging.getLogger("EmailProcessor")
+
+    def process(self):
+        d = defer.Deferred()
+        d.addCallback(self.read_msg)
+        d.addCallback(self.add_to_scoreboard)
+        d.addCallback(self.load_tracking_link)
+        d.addCallback(self.click_link)
+        d.callback("DONE")
+        return d
+
+    def read_msg(self, *args):
+        self.msg = email.message_from_string("\n".join(self.lines))
+        self.cid = self.msg.get("to", "@").split("@")[0]
+        self.logger.debug("cid: %s", self.cid)
+        self.htmlpart = ""
+        for part in self.msg.walk():
+            if part.get_content_maintype() == 'multipart':
+                continue
+            ext = mimetypes.guess_extension(part.get_content_type())
+            #self.logger.debug(ext)    
+            if (ext == ".html"):
+                #self.logger.debug("found html")    
+                self.htmlpart = part.get_payload(decode=1)
+                break
+        
+        qp = QuickParser()
+        qp.feed(self.htmlpart)
+        self.tracking_img = qp.first_img_src
+        self.link = qp.first_link_href
+        
+    def add_to_scoreboard(self, *args):        
+        client.getPage("http://localhost:8002/add?cid=%s&catch_time=%s" % (self.cid, time.time()))
+        #d.addCallback(noop, noop)
+        #return d
+
+    def load_tracking_link(self, *args):
+        if self.tracking_img:
+            self.logger.debug(self.tracking_img)
+            client.getPage(self.tracking_img)
+        else:
+            self.logger.debug("No Tracking")
+
+    def click_link(self, *args):
+        if self.link:
+            self.logger.debug(self.link)
+            client.getPage(self.link)
+        else:
+            self.logger.debug("No Link")
+   
+
 class SinkMessage(object): 
     implements(smtp.IMessage)
 
     def __init__(self):
         self.logger = logging.getLogger("BaseMessage")
         self.lines = []
-        self.FROM = ""    
+        self.FROM = ""     
                     
     def lineReceived(self, line):
         #self.logger.debug("lineRecieved")
@@ -26,23 +104,9 @@ class SinkMessage(object):
 
     def eomReceived(self):
         #self.logger.debug("eomReceived")  
-        #self.logger.debug("self.FROM=%s" % self.FROM)  
-        d = defer.Deferred()
-        self.standardProcess(d)
-        return d
-
-    def standardProcess(self, d):
-        msg = email.message_from_string("\n".join(self.lines))
-        #Just sink that email
-        cid = msg.get("to", "@").split("@")[0]
-        obj_type = msg.get("subject")
-        self.logger.debug("cid: %s len: %s", cid, len(msg.as_string()))
-        client.getPage("http://localhost:8002/add?cid=%s&catch_time=%s" % (cid, time.time()) )
-
-        #with open("/temp/bp/" + str(uuid.uuid4()) + ".txt", "w") as f:
-        #    f.write(msg.as_string())   
-
-        return d.callback("finished")
+        #self.logger.debug("self.FROM=%s" % self.FROM)
+        ep = EmailProcessor(self.lines)
+        return ep.process()
 
     def connectionLost(self):
         self.logger.debug("connectionLost")

@@ -1,5 +1,5 @@
 #Python BulitIns
-import logging, cgi, os, json
+import logging, cgi, os, json, time
 from datetime import datetime
 from collections import defaultdict
 #External Modules
@@ -25,7 +25,8 @@ class AddScore(resource.Resource):
             obj = {}
             for key in request.args.keys():
                 if key != "cid":
-                    score_board[cid][key] = request.args[key][0]
+                    obj[key] = request.args[key][0]
+            score_board[cid][time.time()] = obj
             retval["status"] = "OK"
         else:
             retval["status"] = "FAIL"
