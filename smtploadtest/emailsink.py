@@ -25,11 +25,11 @@ class QuickParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         #self.logger.debug("%s:%s" % tag, attrs)
         if tag == "img" and not self.first_img_src:
-            srcs = [item[1] for item in attrs if item[0] == "src"]
+            srcs = [item[1] for item in attrs if item[0] == "src" and item[1].lower().startsWith("http://") ]
             if srcs:
                 self.first_img_src = srcs[0]
         elif tag == "a" and not self.first_link_href:
-            hrefs = [item[1] for item in attrs if item[0] == "href"]
+            hrefs = [item[1] for item in attrs if item[0] == "href" and item[1].lower().startsWith("http://")]
             if hrefs:
                 self.first_link_href = hrefs[0]
         #ignoreing everything else
@@ -62,11 +62,12 @@ class EmailProcessor(object):
                 #self.logger.debug("found html")    
                 self.htmlpart = part.get_payload(decode=1)
                 break
-        
-        qp = QuickParser()
-        qp.feed(self.htmlpart)
-        self.tracking_img = qp.first_img_src
-        self.link = qp.first_link_href
+
+        if self.htmlpart:
+            qp = QuickParser()
+            qp.feed(self.htmlpart)
+            self.tracking_img = qp.first_img_src
+            self.link = qp.first_link_href
         
     def add_to_scoreboard(self, *args):        
         client.getPage("http://localhost:8002/add?cid=%s&catch_time=%s" % (self.cid, time.time()))
