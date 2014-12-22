@@ -25,11 +25,11 @@ class QuickParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         #self.logger.debug("%s:%s" % tag, attrs)
         if tag == "img" and not self.first_img_src:
-            srcs = [item[1] for item in attrs if item[0] == "src" and item[1].lower().startsWith("http://") ]
+            srcs = [item[1] for item in attrs if item[0] == "src" and item[1].lower().startswith("http://") ]
             if srcs:
                 self.first_img_src = srcs[0]
         elif tag == "a" and not self.first_link_href:
-            hrefs = [item[1] for item in attrs if item[0] == "href" and item[1].lower().startsWith("http://")]
+            hrefs = [item[1] for item in attrs if item[0] == "href" and item[1].lower().startswith("http://")]
             if hrefs:
                 self.first_link_href = hrefs[0]
         #ignoreing everything else
