@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{e177ebff-cab1-4735-a37d-0ec83a03b1aa}</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile />
+    <SearchPath />
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <InterpreterId>{2af0f10d-7135-4994-9156-5d01c9c11b7e}</InterpreterId>
+    <InterpreterVersion>2.7</InterpreterVersion>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
+  <ItemGroup>
+    <Content Include="config-template.json" />
+    <Content Include="config.json" />
+    <Content Include="emailtos.txt" />
+    <Content Include="pitcher.tac" />
+    <Content Include="README.md" />
+    <Content Include="requirements.txt" />
+    <Compile Include="createServer.py" />
+    <Compile Include="smtploadtest\createmsg.py" />
+    <Compile Include="smtploadtest\emailsink.py" />
+    <Compile Include="smtploadtest\paragraphs.py" />
+    <Compile Include="smtploadtest\pitcher.py" />
+    <Compile Include="smtploadtest\scoreboard.py" />
+    <Compile Include="smtploadtest\sendmsg.py" />
+    <Compile Include="smtploadtest\twistedPitcher.py" />
+    <Compile Include="smtploadtest\__init__.py" />
+    <Content Include="runsink.bat" />
+    <Content Include="sink.tac" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="smtploadtest\" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterpreterReference Include="{2af0f10d-7135-4994-9156-5d01c9c11b7e}\2.7" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+</Project>

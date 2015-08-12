@@ -1,0 +1,1 @@
+c:\python\27\python c:\python\27\scripts\twistd.py -n -y sink.tac

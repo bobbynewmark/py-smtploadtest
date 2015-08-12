@@ -1,0 +1,19 @@
+{
+	 "scoreboard_url" : "",
+        "email_from" : [""],
+		"email_from_file": "emailtos.txt",
+        "to_domain" : "",
+        "subject" : "Hey There this is a test message",
+        "preamble" : "",
+        "postamble" : "This is my sign block\n\n<table><tr><td>%(efrom)s</td><td><img src=\"cid:img1\"></td></tr></table>",
+        "text_size" : 1000,
+        "attachments" : [
+			["marker.gif","image", {"Content-ID": "<img1>", "Content-Disposition": "inline"}, 1 ], 
+			["big.jpg", "image", {}, 0.1]
+			],
+        "smtp_ip" : "",
+        "smtp_port" : 25,
+        "inital_wait" : 1, 
+		"pitches_per_min": 20,
+		"length_in_mins":1
+}
